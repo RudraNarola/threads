@@ -50,7 +50,7 @@ const ThreadCard = ({
                 src={author.image}
                 alt="Profile Picture"
                 fill
-                className="rounded-full cursor-pointer"
+                className="rounded-full cursor-pointer object-cover"
               />
             </Link>
             <div className="thread-card_bar"></div>
@@ -120,10 +120,10 @@ const ThreadCard = ({
       {/*] Delete Thrread */}
       {/*] Show comment logos */}
 
-      {!isComment && community && (
+      {!isComment && community ? (
         <Link
           href={`/communities/${community.id}`}
-          className="mt-5 flex items-center"
+          className="mt-3 flex items-center"
         >
           <p className="text-subtle-medium text-gray-1">
             {formatDateString(createdAt)} - {community.name} Community
@@ -135,6 +135,15 @@ const ThreadCard = ({
             height={14}
             className="ml-1 rounded-full object-cover"
           />
+        </Link>
+      ) : (
+        <Link
+          href={`/profile/${currentUserId}`}
+          className="mt-3 flex items-center"
+        >
+          <p className="text-subtle-medium text-gray-1">
+            {formatDateString(createdAt)}
+          </p>
         </Link>
       )}
     </article>
