@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema({
       ref: "Community",
     },
   ],
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Thread",
+    },
+  ],
 });
 
 // first time the second one will be used to create the model

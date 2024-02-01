@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatDateString } from "@/lib/utils";
+import Like from "../forms/Like";
 
 interface Props {
   id: string;
@@ -23,7 +24,12 @@ interface Props {
       image: string;
     };
   }[];
+  userId: string;
   isComment?: boolean;
+}
+
+function handleLike() {
+  console.log("clicked");
 }
 
 const ThreadCard = ({
@@ -35,6 +41,7 @@ const ThreadCard = ({
   community,
   createdAt,
   comments,
+  userId,
   isComment,
 }: Props) => {
   return (
@@ -66,7 +73,7 @@ const ThreadCard = ({
             <p className="mt-2 text-small-regular text-light-2">{content}</p>
 
             <div className={`${isComment && "mb-10"} mt-5 flex flex-row gap-3`}>
-              <div className="flex gap-3.5">
+              {/* <div className="flex gap-3.5">
                 <Image
                   src="/assets/heart-gray.svg"
                   alt="Heart"
@@ -74,12 +81,13 @@ const ThreadCard = ({
                   height={24}
                   className="cursor-pointer object-contain"
                 />
-              </div>
+              </div> */}
+              <Like threadId={id} userId={userId} />
               <div className="flex gap-3.5">
                 <Link href={`/thread/${id}`}>
                   <Image
                     src="/assets/reply.svg"
-                    alt="Heart"
+                    alt="Reply"
                     width={24}
                     height={24}
                     className="cursor-pointer object-contain"
@@ -89,7 +97,7 @@ const ThreadCard = ({
               <div className="flex gap-3.5">
                 <Image
                   src="/assets/repost.svg"
-                  alt="Heart"
+                  alt="Repost"
                   width={24}
                   height={24}
                   className="cursor-pointer object-contain"
@@ -98,7 +106,7 @@ const ThreadCard = ({
               <div className="flex gap-3.5">
                 <Image
                   src="/assets/share.svg"
-                  alt="Heart"
+                  alt="Share"
                   width={24}
                   height={24}
                   className="cursor-pointer object-contain"

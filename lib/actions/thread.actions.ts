@@ -7,6 +7,7 @@ import { connectToDB } from "../mongoose";
 import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import Community from "../models/community.model";
+import { Types } from "mongoose";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   connectToDB();
@@ -241,5 +242,81 @@ export async function addCommentToThread(
   } catch (err) {
     console.error("Error while adding comment:", err);
     throw new Error("Unable to add comment");
+  }
+}
+
+export async function addLikeToThread(
+  threadId: string,
+  userId: string,
+  toAdd: boolean
+) {
+  connectToDB();
+  try {
+    const originalThread = await Thread.findById(threadId);
+    const user = await User.findById(userId);
+
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (toAdd) {
+      originalThread.likes.push(userId);
+      user.likes.push(threadId);
+      await originalThread.save();
+      await user.save();
+    } else {
+      const userIdObject = new Types.ObjectId(userId);
+      const threadIdObject = new Types.ObjectId(threadId);
+
+      originalThread.likes = originalThread.likes.filter(
+        (id: any) => !id.equals(userIdObject)
+      );
+      user.likes = user.likes.filter((id: any) => !id.equals(threadIdObject));
+
+      await originalThread.save();
+      await user.save();
+    }
+  } catch (err) {
+    console.error("Error while adding like:", err);
+    throw new Error("Unable to add like");
+  }
+}
+
+export async function isLikedByUser(threadId: string, userId: string) {
+  connectToDB();
+
+  try {
+    const originalThread = await Thread.findById(threadId);
+
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    console.log(originalThread.likes, userId);
+    console.log("is like by user", originalThread.likes.includes(userId));
+    return originalThread.likes.includes(userId);
+  } catch (err) {
+    console.error("Error while checking like:", err);
+    throw new Error("Unable to check like");
+  }
+}
+
+export async function fetchNumberOfLikes(threadId: string) {
+  connectToDB();
+
+  try {
+    const originalThread = await Thread.findById(threadId);
+
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    return originalThread.likes.length;
+  } catch (err) {
+    console.error("Error while fetching number of likes:", err);
+    throw new Error("Unable to fetch number of likes");
   }
 }
