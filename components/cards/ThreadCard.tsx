@@ -48,7 +48,7 @@ const ThreadCard = ({
 
   return (
     <article
-      className={`flex w-full flex-col rounded-xl mb-6
+      className={`flex w-full flex-col rounded-xl mb-2
       ${isComment ? "px-0 xs:px-7:" : "bg-dark-2 p-7"} `}
     >
       <div className="flex items-start justify-between">
@@ -76,17 +76,25 @@ const ThreadCard = ({
 
             <div className={`${isComment && "mb-1"} mt-3 flex flex-row gap-3`}>
               <Like threadId={id} userId={userId} />
-              <div className="flex gap-3.5">
-                <Link href={`/thread/${id}`}>
-                  <Image
-                    src="/assets/reply.svg"
-                    alt="Reply"
-                    width={24}
-                    height={24}
-                    className="cursor-pointer object-contain"
-                  />
-                </Link>
-              </div>
+
+              <Link
+                href={`/thread/${id}`}
+                className="flex gap-1 flex-row items-center"
+              >
+                <Image
+                  src="/assets/reply.svg"
+                  alt="Reply"
+                  width={24}
+                  height={24}
+                  className="cursor-pointer object-contain"
+                />
+                {comments && comments.length > 0 && (
+                  <p className="mt-1 text-subtle-medium text-gray-1">
+                    {comments.length} replies
+                  </p>
+                )}
+              </Link>
+
               <div className="flex gap-3.5">
                 <Image
                   src="/assets/repost.svg"
@@ -105,14 +113,6 @@ const ThreadCard = ({
                   className="cursor-pointer object-contain"
                 />
               </div>
-
-              {comments && comments.length > 0 && (
-                <Link href={`/thread/${id}`}>
-                  <p className="mt-1 text-subtle-medium text-gray-1">
-                    {comments.length} replies
-                  </p>
-                </Link>
-              )}
             </div>
           </div>
         </div>

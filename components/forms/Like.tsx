@@ -51,7 +51,7 @@ function Like({ threadId, userId }: Props) {
         height={24}
         className="cursor-pointer object-contain"
       />
-      <span className="text-light-3 text-small-regular">{numberOfLikes}</span>
+      <p className="mt-1 text-subtle-medium text-gray-1">{numberOfLikes}</p>
     </div>
   );
 }

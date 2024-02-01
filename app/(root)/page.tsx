@@ -12,6 +12,8 @@ export default async function Home() {
   if (!userInfo) redirect("/sign-in");
   if (!user) redirect("/sign-in");
 
+  console.log("comments 2", result.posts[0]);
+
   return (
     <>
       <h1 className="head-text text-left">Home</h1>
@@ -30,7 +32,7 @@ export default async function Home() {
                 author={post.author}
                 community={post.community}
                 createdAt={post.createdAt}
-                comments={post.comments}
+                comments={post.children}
                 userId={userInfo._id}
               />
             ))}
