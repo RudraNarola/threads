@@ -295,8 +295,6 @@ export async function isLikedByUser(threadId: string, userId: string) {
       throw new Error("Thread not found");
     }
 
-    console.log(originalThread.likes, userId);
-    console.log("is like by user", originalThread.likes.includes(userId));
     return originalThread.likes.includes(userId);
   } catch (err) {
     console.error("Error while checking like:", err);

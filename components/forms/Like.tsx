@@ -43,7 +43,7 @@ function Like({ threadId, userId }: Props) {
   }
 
   return (
-    <div className="flex gap-1.8  items-center" onClick={handleLike}>
+    <div className="flex gap-2  items-center" onClick={handleLike}>
       <Image
         src={`/assets/heart-${isLiked ? "filled" : "gray"}.svg`}
         alt="Heart"
@@ -51,7 +51,7 @@ function Like({ threadId, userId }: Props) {
         height={24}
         className="cursor-pointer object-contain"
       />
-      <span className="text-light-1 text-small-regular">{numberOfLikes}</span>
+      <span className="text-light-3 text-small-regular">{numberOfLikes}</span>
     </div>
   );
 }
