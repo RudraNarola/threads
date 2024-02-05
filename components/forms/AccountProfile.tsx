@@ -22,6 +22,8 @@ import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from "@/lib/uploadthing";
 import { updateUser } from "@/lib/actions/user.actions";
 import { usePathname, useRouter } from "next/navigation";
+import { currentUser } from "@clerk/nextjs";
+import { User } from "@clerk/nextjs/server";
 
 interface Props {
   user: {
@@ -35,11 +37,12 @@ interface Props {
   btnTitle: string;
 }
 
-const AccountProfile = ({ user, btnTitle }: Props) => {
+const AccountProfile = async ({ user, btnTitle }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
   const { startUpload } = useUploadThing("media");
   const router = useRouter();
   const pathname = usePathname();
+  const clerkUser = await currentUser();
 
   const form = useForm({
     resolver: zodResolver(UserValidation),
@@ -75,6 +78,38 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     }
   }
 
+  interface UpdateUserParams {
+    name: string;
+    image: string;
+    username: string;
+  }
+
+  // async function update({
+  //   username,
+  //   image,
+  //   name,
+  // }: UpdateUserParams): Promise<User> {
+
+  //   const response = await fetch("https://api.clerk.com/v1", {
+  //     method: "PATCH",
+  //     body: {
+  //       first_name: name,
+  //       username: username,
+  //       profile_image_id: image,
+  //     },
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //   });
+
+  //   if (!response.ok) {
+  //     throw new Error("Failed to update user profile");
+  //   }
+
+  //   const updatedUser = await response.json();
+  //   return updatedUser;
+  // }
+
   async function onSubmit(values: z.infer<typeof UserValidation>) {
     const blob = values.profile_photo;
     const hasImageChanged = isBase64Image(blob);
@@ -95,6 +130,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
       userId: user.id,
       path: pathname,
     });
+
+    // update({
+    //   name: values.name,
+    //   image: values.profile_photo,
+    //   username: values.username,
+    // });
 
     if (pathname === "/profile/edit") {
       router.back();
