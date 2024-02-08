@@ -1,29 +1,29 @@
 "use client";
 
+import * as z from "zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { usePathname, useRouter } from "next/navigation";
+import { ChangeEvent, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UserValidation } from "@/lib/validations/user";
-import { Button } from "@/components/ui/button";
+
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import * as z from "zod";
-import { ChangeEvent, use, useState } from "react";
-import { isBase64Image } from "@/lib/utils";
+
 import { useUploadThing } from "@/lib/uploadthing";
-import { updateUser } from "@/lib/actions/user.actions";
-import { usePathname, useRouter } from "next/navigation";
-import { currentUser } from "@clerk/nextjs";
-import { User } from "@clerk/nextjs/server";
+import { isBase64Image } from "@/lib/utils";
+
+import { UserValidation } from "@/lib/validations/user";
+import { updateUser, updateUserOnClerk } from "@/lib/actions/user.actions";
 
 interface Props {
   user: {
@@ -37,34 +37,63 @@ interface Props {
   btnTitle: string;
 }
 
-const AccountProfile = async ({ user, btnTitle }: Props) => {
-  const [files, setFiles] = useState<File[]>([]);
-  const { startUpload } = useUploadThing("media");
+const AccountProfile = ({ user, btnTitle }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
-  const clerkUser = await currentUser();
+  const { startUpload } = useUploadThing("media");
 
-  const form = useForm({
+  const [files, setFiles] = useState<File[]>([]);
+
+  const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
     defaultValues: {
-      profile_photo: user?.image || "",
-      name: user?.name || "",
-      username: user?.username || "",
-      bio: user?.bio || "",
+      profile_photo: user?.image ? user.image : "",
+      name: user?.name ? user.name : "",
+      username: user?.username ? user.username : "",
+      bio: user?.bio ? user.bio : "",
     },
   });
 
-  function handleImage(
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    const blob = values.profile_photo;
+
+    const hasImageChanged = isBase64Image(blob);
+    if (hasImageChanged) {
+      const imgRes = await startUpload(files);
+
+      if (imgRes && imgRes[0].url) {
+        values.profile_photo = imgRes[0].url;
+        console.log("values.profile_photo", values.profile_photo);
+        await updateUserOnClerk(user.id, values.profile_photo);
+      }
+    }
+
+    await updateUser({
+      name: values.name,
+      path: pathname,
+      username: values.username,
+      userId: user.id,
+      bio: values.bio,
+      image: values.profile_photo,
+    });
+
+    if (pathname === "/profile/edit") {
+      router.back();
+    } else {
+      router.push("/");
+    }
+  };
+
+  const handleImage = (
     e: ChangeEvent<HTMLInputElement>,
-    fieldChange: (vlaue: string) => void
-  ) {
+    fieldChange: (value: string) => void
+  ) => {
     e.preventDefault();
 
     const fileReader = new FileReader();
 
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-
       setFiles(Array.from(e.target.files));
 
       if (!file.type.includes("image")) return;
@@ -76,73 +105,7 @@ const AccountProfile = async ({ user, btnTitle }: Props) => {
 
       fileReader.readAsDataURL(file);
     }
-  }
-
-  interface UpdateUserParams {
-    name: string;
-    image: string;
-    username: string;
-  }
-
-  // async function update({
-  //   username,
-  //   image,
-  //   name,
-  // }: UpdateUserParams): Promise<User> {
-
-  //   const response = await fetch("https://api.clerk.com/v1", {
-  //     method: "PATCH",
-  //     body: {
-  //       first_name: name,
-  //       username: username,
-  //       profile_image_id: image,
-  //     },
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //   });
-
-  //   if (!response.ok) {
-  //     throw new Error("Failed to update user profile");
-  //   }
-
-  //   const updatedUser = await response.json();
-  //   return updatedUser;
-  // }
-
-  async function onSubmit(values: z.infer<typeof UserValidation>) {
-    const blob = values.profile_photo;
-    const hasImageChanged = isBase64Image(blob);
-
-    if (hasImageChanged) {
-      const imgRes = await startUpload(files);
-
-      if (imgRes && imgRes[0].url) {
-        values.profile_photo = imgRes[0].url;
-      }
-    }
-
-    await updateUser({
-      bio: values.bio,
-      name: values.name,
-      image: values.profile_photo,
-      username: values.username,
-      userId: user.id,
-      path: pathname,
-    });
-
-    // update({
-    //   name: values.name,
-    //   image: values.profile_photo,
-    //   username: values.username,
-    // });
-
-    if (pathname === "/profile/edit") {
-      router.back();
-    } else {
-      router.push("/");
-    }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -150,7 +113,6 @@ const AccountProfile = async ({ user, btnTitle }: Props) => {
         className="flex flex-col justify-start gap-10"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        {/* // profile photo */}
         <FormField
           control={form.control}
           name="profile_photo"
@@ -185,12 +147,10 @@ const AccountProfile = async ({ user, btnTitle }: Props) => {
                   onChange={(e) => handleImage(e, field.onChange)}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
 
-        {/* Name field  */}
         <FormField
           control={form.control}
           name="name"
@@ -211,7 +171,6 @@ const AccountProfile = async ({ user, btnTitle }: Props) => {
           )}
         />
 
-        {/* Username field  */}
         <FormField
           control={form.control}
           name="username"
@@ -232,7 +191,6 @@ const AccountProfile = async ({ user, btnTitle }: Props) => {
           )}
         />
 
-        {/* Bio field  */}
         <FormField
           control={form.control}
           name="bio"

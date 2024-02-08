@@ -26,7 +26,7 @@ export default function RootLayout({
         <body className={inter.className}>
           <Topbar />
 
-          <main className="flex flex-row">
+          <main className="flex flex-row h-full">
             <LeftSidebar />
             <section className="main-container">
               <div className="w-full max-w-4xl">{children}</div>

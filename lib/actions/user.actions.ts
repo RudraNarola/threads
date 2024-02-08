@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
+import { NextRequest, NextResponse } from "next/server";
+import { getAuth, clerkClient } from "@clerk/nextjs/server";
 
 import { connectToDB } from "../mongoose";
 
@@ -180,4 +182,19 @@ export async function getActivity(userId: string) {
     console.error("Error fetching replies: ", error);
     throw error;
   }
+}
+
+// If you use `request` you don't need the type
+export async function POST(req: NextRequest) {
+  // Get the user ID from the session
+  const { userId } = getAuth(req);
+
+  if (!userId) return NextResponse.redirect("/sign-in");
+
+  // The user attributes to update
+  const params = { firstName: "John", lastName: "Wick" };
+
+  const updatedUser = await clerkClient.users.updateUser(userId, params);
+
+  return NextResponse.json({ updatedUser });
 }
