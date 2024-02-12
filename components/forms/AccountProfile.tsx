@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
 import { ChangeEvent, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import {
   Form,
   FormControl,
@@ -25,7 +24,7 @@ import { isBase64Image } from "@/lib/utils";
 import { UserValidation } from "@/lib/validations/user";
 import { updateUser } from "@/lib/actions/user.actions";
 import { revalidatePath } from "next/cache";
-import { useUser } from "@clerk/nextjs";
+import { clerkClient, useUser } from "@clerk/nextjs";
 import { error } from "console";
 
 interface Props {
@@ -38,6 +37,10 @@ interface Props {
     image: string;
   };
   btnTitle: string;
+}
+
+interface SetProfileImageParams {
+  file: Blob | File | string | null;
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
@@ -69,10 +72,12 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
         values.profile_photo = imgRes[0].url;
         console.log("values.profile_photo", values.profile_photo);
         try {
+          // console.log(files);
+          console.log("clerk -- >", clerkUser?.imageUrl);
           const result = await clerkUser?.setProfileImage({
             file: imgRes[0].url,
           });
-          console.log("Image --> ", result);
+          console.log("result ---- >", result);
         } catch (Error) {
           console.log("Updating pic on clerk failed", Error);
         }
