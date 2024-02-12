@@ -1,45 +1,51 @@
 "use client";
 import {
   addLikeToThread,
-  fetchNumberOfLikes,
-  isLikedByUser,
+  removeLikeFromThread,
 } from "@/lib/actions/thread.actions";
-import { fetchUser } from "@/lib/actions/user.actions";
-import { set } from "mongoose";
 import Image from "next/image";
-import { use, useEffect, useState } from "react";
+import { useState } from "react";
 
 interface Props {
   threadId: string;
-  userId: string;
+  userId: string; // monogoDbId
+  currentUserId: string;
+  isLikedByUser: boolean;
+  numberOfLikes: number;
 }
-function Like({ threadId, userId }: Props) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [numberOfLikes, setNumberOfLikes] = useState(0);
+
+function Like({
+  threadId,
+  userId,
+  isLikedByUser,
+  currentUserId,
+  numberOfLikes,
+}: Props) {
+  const [isLiked, setIsLiked] = useState(isLikedByUser);
+  const [numberOfLikesState, setNumberOfLikesState] = useState(numberOfLikes);
 
   async function isLike() {
-    const result = await isLikedByUser(threadId, userId);
-    console.log("Is liked by user", result);
-    setIsLiked(result);
+    setIsLiked((prev) => !prev);
   }
 
-  async function addLikes() {
-    addLikeToThread(threadId, userId, !isLiked);
-  }
-  async function fetchNoOfLikes() {
-    const result = await fetchNumberOfLikes(threadId);
-    setNumberOfLikes(result);
+  async function likeThread() {
+    addLikeToThread(threadId, userId, currentUserId);
   }
 
-  useEffect(() => {
-    isLike();
-    fetchNoOfLikes();
-  }, []);
+  async function unlikeThread() {
+    removeLikeFromThread(threadId, userId, currentUserId);
+  }
 
   async function handleLike() {
-    addLikes();
+    if (isLiked) {
+      unlikeThread();
+    } else {
+      likeThread();
+    }
     setIsLiked(!isLiked);
-    setNumberOfLikes(isLiked ? numberOfLikes - 1 : numberOfLikes + 1);
+    setNumberOfLikesState(
+      isLiked ? numberOfLikesState - 1 : numberOfLikesState + 1
+    );
   }
 
   return (
@@ -51,7 +57,9 @@ function Like({ threadId, userId }: Props) {
         height={24}
         className="cursor-pointer object-contain"
       />
-      <p className="mt-1 text-subtle-medium text-gray-1">{numberOfLikes}</p>
+      <p className="mt-1 text-subtle-medium text-gray-1">
+        {numberOfLikesState}
+      </p>
     </div>
   );
 }

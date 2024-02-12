@@ -23,7 +23,7 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { isBase64Image } from "@/lib/utils";
 
 import { UserValidation } from "@/lib/validations/user";
-import { updateUser, updateUserOnClerk } from "@/lib/actions/user.actions";
+import { updateUser } from "@/lib/actions/user.actions";
 
 interface Props {
   user: {
@@ -64,7 +64,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
       if (imgRes && imgRes[0].url) {
         values.profile_photo = imgRes[0].url;
         console.log("values.profile_photo", values.profile_photo);
-        await updateUserOnClerk(user.id, values.profile_photo);
+        // await updateUserOnClerk(user.id, values.profile_photo);
       }
     }
 

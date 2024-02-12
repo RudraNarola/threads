@@ -13,9 +13,8 @@ async function Page({ params }: { params: { id: string } }) {
 
   if (!user) return null;
 
-  // user whose profile is being viewed
+  // // user whose profile is being viewed
   const userInfo = await fetchUser(params.id);
-
   if (!userInfo?.onboarded) {
     redirect("/onboarding");
   }
@@ -47,8 +46,8 @@ async function Page({ params }: { params: { id: string } }) {
 
                 {tab.value === "threads" && (
                   <p
-                    className="ml-1 rounded-sm bg-light-4 px-2 py-1 
-                  !text-tiny-medium text-light-2"
+                    className="ml-1 rounded-sm bg-light-4 px-2 py-1
+                   !text-tiny-medium text-light-2"
                   >
                     {userInfo?.threads?.length}
                   </p>
@@ -64,9 +63,9 @@ async function Page({ params }: { params: { id: string } }) {
               className="w-full text-light-1"
             >
               <ThreadsTab
-                currentUserId={user.id}
-                accountId={userInfo.id}
+                currentUserId={userInfo.id}
                 accountType="User"
+                accountId={userInfo._id} // accountId == userID from MongoDB
               />
             </TabsContent>
           ))}

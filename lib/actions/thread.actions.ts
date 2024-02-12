@@ -8,6 +8,8 @@ import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import Community from "../models/community.model";
 import { Types } from "mongoose";
+import { use } from "react";
+import { fetchUser } from "./user.actions";
 
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   connectToDB();
@@ -245,15 +247,37 @@ export async function addCommentToThread(
   }
 }
 
+export async function isLikedByUser(threadId: string, userId: string) {
+  connectToDB();
+
+  try {
+    const originalThread = await Thread.findById(JSON.parse(threadId));
+
+    console.log("original thread", originalThread, threadId, userId);
+    if (!originalThread) {
+      throw new Error("Thread not found");
+    }
+
+    console.log("user object id ->", userId);
+    const result = originalThread.likes.includes(userId);
+
+    console.log("is liked by user on actions", result);
+    return result;
+  } catch (err) {
+    console.error("Error while checking like:", err);
+    throw new Error("Unable to check like");
+  }
+}
+
 export async function addLikeToThread(
   threadId: string,
   userId: string,
-  toAdd: boolean
+  currentUserId: string
 ) {
   connectToDB();
   try {
     const originalThread = await Thread.findById(threadId);
-    const user = await User.findById(userId);
+    const user = await fetchUser(currentUserId);
 
     if (!originalThread) {
       throw new Error("Thread not found");
@@ -262,43 +286,45 @@ export async function addLikeToThread(
       throw new Error("User not found");
     }
 
-    if (toAdd) {
-      originalThread.likes.push(userId);
-      user.likes.push(threadId);
-      await originalThread.save();
-      await user.save();
-    } else {
-      const userIdObject = new Types.ObjectId(userId);
-      const threadIdObject = new Types.ObjectId(threadId);
-
-      originalThread.likes = originalThread.likes.filter(
-        (id: any) => !id.equals(userIdObject)
-      );
-      user.likes = user.likes.filter((id: any) => !id.equals(threadIdObject));
-
-      await originalThread.save();
-      await user.save();
-    }
+    originalThread.likes.push(user._id);
+    user.likes.push(threadId);
+    await originalThread.save();
+    await user.save();
   } catch (err) {
     console.error("Error while adding like:", err);
     throw new Error("Unable to add like");
   }
 }
 
-export async function isLikedByUser(threadId: string, userId: string) {
+export async function removeLikeFromThread(
+  threadId: string,
+  userId: string,
+  currentUserId: string
+) {
   connectToDB();
-
   try {
     const originalThread = await Thread.findById(threadId);
+    const user = await fetchUser(currentUserId);
 
     if (!originalThread) {
       throw new Error("Thread not found");
     }
+    if (!user) {
+      throw new Error("User not found");
+    }
 
-    return originalThread.likes.includes(userId);
+    const threadIdObject = new Types.ObjectId(threadId);
+
+    originalThread.likes = originalThread.likes.filter(
+      (id: any) => !id.equals(user._id)
+    );
+    user.likes = user.likes.filter((id: any) => !id.equals(threadIdObject));
+
+    await originalThread.save();
+    await user.save();
   } catch (err) {
-    console.error("Error while checking like:", err);
-    throw new Error("Unable to check like");
+    console.error("Error while adding like:", err);
+    throw new Error("Unable to add like");
   }
 }
 
@@ -311,7 +337,6 @@ export async function fetchNumberOfLikes(threadId: string) {
     if (!originalThread) {
       throw new Error("Thread not found");
     }
-
     return originalThread.likes.length;
   } catch (err) {
     console.error("Error while fetching number of likes:", err);

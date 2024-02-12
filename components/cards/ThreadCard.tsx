@@ -2,6 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatDateString } from "@/lib/utils";
 import Like from "../forms/Like";
+import {
+  fetchNumberOfLikes,
+  isLikedByUser,
+} from "@/lib/actions/thread.actions";
 
 interface Props {
   id: string;
@@ -32,7 +36,7 @@ function handleLike() {
   console.log("clicked");
 }
 
-const ThreadCard = ({
+const ThreadCard = async ({
   id,
   currentUserId,
   parentId,
@@ -45,6 +49,11 @@ const ThreadCard = ({
   isComment,
 }: Props) => {
   console.log("comments", comments);
+
+  // currentuserId => MongoDb ID
+
+  const result = await isLikedByUser(JSON.stringify(id), userId);
+  const numberOfLikes = await fetchNumberOfLikes(id);
 
   return (
     <article
@@ -75,7 +84,13 @@ const ThreadCard = ({
             <p className="mt-2 text-small-regular text-light-2">{content}</p>
 
             <div className={`${isComment && "mb-1"} mt-3 flex flex-row gap-3`}>
-              <Like threadId={id} userId={userId} />
+              <Like
+                isLikedByUser={result}
+                threadId={id}
+                currentUserId={currentUserId}
+                userId={userId}
+                numberOfLikes={numberOfLikes}
+              />
 
               <Link
                 href={`/thread/${id}`}

@@ -9,15 +9,16 @@ interface Props {
   accountType: string;
 }
 
+// currentuserId => MongoDb ID
 const ThreadsTab = async ({ currentUserId, accountId, accountType }: Props) => {
   let result: any;
 
   if (accountType === "community") {
     result = await fetchCommunityPosts(accountId);
   } else {
-    result = await fetchUserPosts(accountId);
+    result = await fetchUserPosts(currentUserId);
   }
-  if (!result) redirect("/");
+  // if (!result) redirect("/");
 
   return (
     <section className="mt-9 flex flex-col gap-10">
@@ -36,10 +37,11 @@ const ThreadsTab = async ({ currentUserId, accountId, accountType }: Props) => {
                   image: thread.author.image,
                   id: thread.author.id,
                 }
-          } // todo
-          community={thread.community} // todo
+          }
+          community={thread.community}
           createdAt={thread.createdAt}
           comments={thread.comments}
+          userId={accountId}
         />
       ))}
     </section>
