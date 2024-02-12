@@ -16,6 +16,7 @@ interface Props {
     name: string;
     image: string;
     id: string;
+    _id: string;
   };
   community: {
     id: string;
@@ -30,6 +31,7 @@ interface Props {
   }[];
   userId: string;
   isComment?: boolean;
+  isUserThread?: boolean;
 }
 
 function handleLike() {
@@ -47,9 +49,8 @@ const ThreadCard = async ({
   comments,
   userId,
   isComment,
+  isUserThread,
 }: Props) => {
-  console.log("comments", comments);
-
   // currentuserId => MongoDb ID
 
   const result = await isLikedByUser(JSON.stringify(id), userId);
@@ -75,11 +76,23 @@ const ThreadCard = async ({
           </div>
 
           <div className="flex w-full flex-col">
-            <Link href={`/profile/${author.id}`} className="w-fit">
-              <h4 className="cursor-pointer text-base-semibold text-light-1">
-                {author.name}
-              </h4>
-            </Link>
+            <div className="flex items-center justify-between w-full">
+              <Link href={`/profile/${author.id}`} className="w-fit">
+                <h4 className="cursor-pointer text-base-semibold text-light-1">
+                  {author.name}
+                </h4>
+              </Link>
+              {JSON.stringify(author._id) === JSON.stringify(userId) && (
+                <Link href={`/thread/edit/${id}`}>
+                  <Image
+                    src="/assets/edit.svg"
+                    alt="edit"
+                    height={16}
+                    width={16}
+                  />
+                </Link>
+              )}
+            </div>
 
             <p className="mt-2 text-small-regular text-light-2">{content}</p>
 

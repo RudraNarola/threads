@@ -16,24 +16,19 @@ import { Textarea } from "@/components/ui/textarea";
 import * as z from "zod";
 import { usePathname, useRouter } from "next/navigation";
 import { ThreadValidation } from "@/lib/validations/thread";
-import { createThread } from "@/lib/actions/thread.actions";
+import { createThread, updateThread } from "@/lib/actions/thread.actions";
 import { useOrganization } from "@clerk/nextjs";
 
 // import { updateUser } from "@/lib/actions/user.actions";
 
 interface Props {
-  user: {
-    id: string;
-    objectId: string;
-    username: string;
-    name: string;
-    bio: string;
-    image: string;
-  };
+  userId: string;
   btnTitle: string;
+  content: string | "";
+  threadId?: string | "";
 }
 
-function PostThread({ userId }: { userId: string }) {
+function PostThread({ userId, btnTitle, content, threadId }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -42,21 +37,30 @@ function PostThread({ userId }: { userId: string }) {
   const form = useForm({
     resolver: zodResolver(ThreadValidation),
     defaultValues: {
-      thread: "",
+      thread: content,
       accountId: userId,
     },
   });
 
-  console.log(organization);
   const onSubmit = async (values: z.infer<typeof ThreadValidation>) => {
-    await createThread({
-      text: values.thread,
-      author: userId,
-      communityId: organization ? organization.id : null,
-      path: pathname,
-    });
-
-    router.push("/");
+    if (threadId) {
+      await updateThread({
+        threadId: threadId,
+        text: values.thread,
+        path: pathname,
+        communityId: organization ? organization.id : null,
+      });
+      router.back();
+      router.refresh();
+    } else {
+      await createThread({
+        text: values.thread,
+        author: userId,
+        communityId: organization ? organization.id : null,
+        path: pathname,
+      });
+      router.push("/");
+    }
   };
 
   return (
@@ -65,7 +69,6 @@ function PostThread({ userId }: { userId: string }) {
         className=" flex flex-col justify-start gap-10"
         onSubmit={form.handleSubmit(onSubmit)}
       >
-        );
         <FormField
           control={form.control}
           name="thread"
@@ -82,7 +85,7 @@ function PostThread({ userId }: { userId: string }) {
           )}
         />
         <Button type="submit" className="bg-primary-500">
-          Post Thread
+          {btnTitle}
         </Button>
       </form>
     </Form>

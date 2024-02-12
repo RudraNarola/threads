@@ -31,11 +31,17 @@ const ThreadsTab = async ({ currentUserId, accountId, accountType }: Props) => {
           content={thread.text}
           author={
             accountType == "User"
-              ? { name: result.name, image: result.image, id: result.id }
+              ? {
+                  name: result.name,
+                  image: result.image,
+                  id: result.id,
+                  _id: result._id,
+                }
               : {
                   name: thread.author.name,
                   image: thread.author.image,
                   id: thread.author.id,
+                  _id: thread.author._id,
                 }
           }
           community={thread.community}

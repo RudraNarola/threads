@@ -35,7 +35,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
       populate: {
         path: "author", // Populate the author field within children
         model: User,
-        select: "_id name parentId image", // Select only _id and username fields of the author
+        select: "_id name parentId image createdAt updateAt", // Select only _id and username fields of the author
       },
     });
 
@@ -90,6 +90,28 @@ export async function createThread({
         $push: { threads: createdThread._id },
       });
     }
+
+    revalidatePath(path);
+  } catch (error: any) {
+    throw new Error(`Failed to create thread: ${error.message}`);
+  }
+}
+
+interface updateParams {
+  threadId: string;
+  text: string;
+  path: string;
+  communityId: string | null;
+}
+export async function updateThread({
+  threadId,
+  text,
+  path,
+  communityId,
+}: updateParams) {
+  connectToDB();
+  try {
+    const result = await Thread.updateOne({ _id: threadId }, { text });
 
     revalidatePath(path);
   } catch (error: any) {

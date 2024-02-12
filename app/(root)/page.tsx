@@ -10,8 +10,8 @@ export default async function Home() {
   const userInfo = await fetchUser(user?.id || "");
 
   if (!user) redirect("/sign-in");
-   if (!userInfo) redirect("/onboarding");
-  
+  if (!userInfo) redirect("/onboarding");
+
   return (
     <>
       <h1 className="head-text text-left">Home</h1>

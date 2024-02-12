@@ -33,16 +33,19 @@ const ProfileHeader = ({
             />
           </div>
           <div className="flex-1">
-            <h2 className="text-left text-heading3-bold text-light-1">
+            <h2 className="text-left text-heading3-bold text-light-1 flex items-center gap-3">
               {name}
+              <Link href={`/profile/edit/${accountId}`}>
+                <Image
+                  src="/assets/edit.svg"
+                  alt={"Edit"}
+                  height={16}
+                  width={16}
+                />
+              </Link>
             </h2>
             <p className="text-base-medium text-gray-1">@{username}</p>
           </div>
-          {/* <Link href={`/profile/edit/${authUserId}`}>
-            <div className="text-left text-heading3-bold text-light-1">
-              Edit
-            </div>
-          </Link> */}
         </div>
       </div>
 
