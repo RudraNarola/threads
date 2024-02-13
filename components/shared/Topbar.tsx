@@ -50,7 +50,7 @@ async function Topbar() {
             },
           }}
         /> */}
-        <Link href={`/profile/${clerkuser.id}`}>
+        {/* <Link href={`/profile/${clerkuser.id}`}>
           <Button className="flex gap-2 items-center" variant="ghost">
             <p className="text-heading4-medium-bold ">{userInfo.name}</p>
             <div className="object-cover">
@@ -63,13 +63,13 @@ async function Topbar() {
               />
             </div>
           </Button>
-        </Link>
-        {/* <UserButton
+        </Link> */}
+        <UserButton
           showName={true}
           appearance={{
             baseTheme: dark,
           }}
-        /> */}
+        />
 
         {/* <OrganizationSwitcher
           appearance={{

@@ -4,7 +4,7 @@ import * as z from "zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { usePathname, useRouter } from "next/navigation";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, use, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
@@ -24,7 +24,7 @@ import { isBase64Image } from "@/lib/utils";
 import { UserValidation } from "@/lib/validations/user";
 import { updateUser } from "@/lib/actions/user.actions";
 import { revalidatePath } from "next/cache";
-import { clerkClient, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { error } from "console";
 
 interface Props {
@@ -50,6 +50,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   const { startUpload } = useUploadThing("media");
 
   const [files, setFiles] = useState<File[]>([]);
+  const [file, setFile] = useState<File>();
 
   const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
@@ -68,18 +69,18 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     if (hasImageChanged) {
       const imgRes = await startUpload(files);
 
-      if (imgRes && imgRes[0].url) {
+      if (imgRes && imgRes[0].url && file) {
         values.profile_photo = imgRes[0].url;
-        console.log("values.profile_photo", values.profile_photo);
+        console.log("File", file);
+
         try {
-          // console.log(files);
-          console.log("clerk -- >", clerkUser?.imageUrl);
+          console.log(clerkUser);
           const result = await clerkUser?.setProfileImage({
-            file: imgRes[0].url,
+            file: file,
           });
-          console.log("result ---- >", result);
-        } catch (Error) {
-          console.log("Updating pic on clerk failed", Error);
+          console.log(result);
+        } catch (Error: any) {
+          console.log("Clerk photo update error", Error.message);
         }
       }
     }
@@ -111,8 +112,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
+      setFile(file);
       setFiles(Array.from(e.target.files));
-
       if (!file.type.includes("image")) return;
 
       fileReader.onload = async (event) => {
