@@ -18,8 +18,6 @@ const Page = async ({ params }: { params: { id: string } }) => {
     return notFound();
   }
 
-  console.log(userInfo);
-
   const userData = {
     id: user.id,
     objectId: userInfo?._id,

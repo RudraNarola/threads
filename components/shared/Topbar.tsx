@@ -10,15 +10,8 @@ import {
 import { dark } from "@clerk/themes";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../ui/button";
 
 async function Topbar() {
-  const clerkuser = await currentUser();
-
-  if (!clerkuser) return null;
-
-  const userInfo = await fetchUser(clerkuser?.id);
-
   return (
     <div className="topbar">
       <Link href="/" className="flex items-center gap-4">

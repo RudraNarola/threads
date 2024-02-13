@@ -22,10 +22,8 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { isBase64Image } from "@/lib/utils";
 
 import { UserValidation } from "@/lib/validations/user";
-import { updateUser } from "@/lib/actions/user.actions";
-import { revalidatePath } from "next/cache";
-import { useUser } from "@clerk/nextjs";
-import { error } from "console";
+import { updateUser, updateUserOnClerk } from "@/lib/actions/user.actions";
+import { clerkClient, useUser } from "@clerk/nextjs";
 
 interface Props {
   user: {
@@ -37,10 +35,6 @@ interface Props {
     image: string;
   };
   btnTitle: string;
-}
-
-interface SetProfileImageParams {
-  file: Blob | File | string | null;
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
@@ -71,14 +65,11 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
       if (imgRes && imgRes[0].url && file) {
         values.profile_photo = imgRes[0].url;
-        console.log("File", file);
 
         try {
-          console.log(clerkUser);
           const result = await clerkUser?.setProfileImage({
             file: file,
           });
-          console.log(result);
         } catch (Error: any) {
           console.log("Clerk photo update error", Error.message);
         }
@@ -93,6 +84,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
       bio: values.bio,
       image: values.profile_photo,
     });
+
+    await updateUserOnClerk(user.id, values.username, values.name);
 
     if (pathname === `/profile/edit/${user.id}`) {
       router.push(`/profile/${user.id}`);

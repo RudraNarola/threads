@@ -7,8 +7,7 @@ import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 import { NextRequest, NextResponse } from "next/server";
-import { getAuth, clerkClient } from "@clerk/nextjs/server";
-
+import { getAuth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { connectToDB } from "../mongoose";
 
 export async function fetchUser(userId: string) {
@@ -22,6 +21,38 @@ export async function fetchUser(userId: string) {
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);
   }
+}
+
+export async function updateUserOnClerk(
+  userId: string,
+  username: string,
+  firstName: string
+) {
+  const params = {
+    firstName: firstName,
+    lastName: "",
+    username: username,
+  };
+
+  const user = await clerkClient.users.updateUser(userId, params);
+  console.log(user);
+}
+
+export async function getLoggedUser() {
+  const clerkUser = await currentUser();
+  if (!clerkUser) {
+    throw new Error("User is not Found on Clerk");
+  }
+  const userInfo = await fetchUser(clerkUser.id);
+
+  return {
+    id: clerkUser.id,
+    _id: userInfo._id,
+    username: userInfo.username,
+    onboarded: userInfo.onboarded,
+    image: userInfo.image,
+    name: userInfo.name,
+  };
 }
 
 interface Params {

@@ -15,6 +15,7 @@ async function Page({ params }: { params: { id: string } }) {
 
   // // user whose profile is being viewed
   const userInfo = await fetchUser(params.id);
+  const loggedUser = await fetchUser(user.id);
   if (!userInfo?.onboarded) {
     redirect("/onboarding");
   }
@@ -66,6 +67,7 @@ async function Page({ params }: { params: { id: string } }) {
                 currentUserId={userInfo.id}
                 accountType="User"
                 accountId={userInfo._id} // accountId == userID from MongoDB
+                loggedUserId={loggedUser._id}
               />
             </TabsContent>
           ))}

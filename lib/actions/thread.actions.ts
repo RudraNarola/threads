@@ -275,15 +275,12 @@ export async function isLikedByUser(threadId: string, userId: string) {
   try {
     const originalThread = await Thread.findById(JSON.parse(threadId));
 
-    console.log("original thread", originalThread, threadId, userId);
     if (!originalThread) {
       throw new Error("Thread not found");
     }
 
-    console.log("user object id ->", userId);
     const result = originalThread.likes.includes(userId);
 
-    console.log("is liked by user on actions", result);
     return result;
   } catch (err) {
     console.error("Error while checking like:", err);

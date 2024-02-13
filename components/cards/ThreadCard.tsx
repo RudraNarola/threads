@@ -6,17 +6,7 @@ import {
   fetchNumberOfLikes,
   isLikedByUser,
 } from "@/lib/actions/thread.actions";
-import { Delete, Edit } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import DropDownMenu from "./DropDownMenu";
 
 interface Props {
@@ -43,10 +33,7 @@ interface Props {
   }[];
   userId: string;
   isComment?: boolean;
-}
-
-function handleLike() {
-  console.log("clicked");
+  loggedUserId: string;
 }
 
 const ThreadCard = async ({
@@ -60,6 +47,7 @@ const ThreadCard = async ({
   comments,
   userId,
   isComment,
+  loggedUserId,
 }: Props) => {
   // currentuserId => MongoDb ID
 
@@ -92,7 +80,7 @@ const ThreadCard = async ({
                   {author.name}
                 </h4>
               </Link>
-              {JSON.stringify(author._id) === JSON.stringify(userId) && (
+              {JSON.stringify(author._id) === JSON.stringify(loggedUserId) && (
                 <>
                   <DropDownMenu id={id} />
                 </>
