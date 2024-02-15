@@ -20,8 +20,6 @@ const Page = async ({ params }: { params: { id: string } }) => {
     return notFound();
   }
 
-  console.log(thread);
-
   return (
     <>
       <h1 className="head-text mb-4"> Edit Thread</h1>

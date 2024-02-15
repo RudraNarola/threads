@@ -1,4 +1,4 @@
-import { fetchUser } from "@/lib/actions/user.actions";
+import { fetchUser, getLoggedUser } from "@/lib/actions/user.actions";
 import {
   currentUser,
   OrganizationSwitcher,
@@ -12,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 async function Topbar() {
+  const user = await getLoggedUser();
   return (
     <div className="topbar">
       <Link href="/" className="flex items-center gap-4">
@@ -19,7 +20,7 @@ async function Topbar() {
         <p className="text-heading3-bold text-light-1 max-xs:hidden">Threads</p>
       </Link>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <div className="block md:hidden">
           <SignedIn>
             <SignOutButton>
@@ -57,12 +58,21 @@ async function Topbar() {
             </div>
           </Button>
         </Link> */}
-        <UserButton
-          showName={true}
-          appearance={{
-            baseTheme: dark,
-          }}
-        />
+        <div className="flex items-center gap-4">
+          <p className="text-heading4-medium text-light-1 max-md:hidden">
+            {user.name}
+          </p>
+          <UserButton
+            appearance={{
+              baseTheme: dark,
+
+              elements: {
+                userButtonBox: "w-full",
+                avatarBox: "h-12 w-full",
+              },
+            }}
+          />
+        </div>
 
         {/* <OrganizationSwitcher
           appearance={{

@@ -9,42 +9,70 @@ const UserCard = ({
   username,
   imgUrl,
   personType,
+  size = "default",
 }: {
   id: string;
   name: string;
   username: string;
   imgUrl: string;
   personType: string;
+  size?: string;
 }) => {
   const router = useRouter();
 
-  return (
-    <article className="user-card">
-      <div className="user-card_avatar">
-        <Image
-          src={imgUrl}
-          alt={name}
-          width={48}
-          height={48}
-          className="rounded-full"
-        />
-      </div>
+  {
+    return size === "default" ? (
+      <article className="user-card">
+        <div className="user-card_avatar">
+          <Image
+            src={imgUrl}
+            alt={name}
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+        </div>
 
-      <div className="flex-1 text-ellipsis">
-        <h4 className="text-base-semibold text-light-1">{name}</h4>
-        <p className="text-small-medium text-gray-1">@{username}</p>
-      </div>
+        <div className="flex-1 text-ellipsis">
+          <h4 className="text-base-semibold text-light-1">{name}</h4>
+          <p className="text-small-medium text-gray-1">@{username}</p>
+        </div>
 
+        <Button
+          className="user-card_btn"
+          onClick={() => {
+            router.push(`/profile/${id}`);
+          }}
+        >
+          View
+        </Button>
+      </article>
+    ) : (
       <Button
-        className="user-card_btn"
         onClick={() => {
           router.push(`/profile/${id}`);
         }}
+        variant="ghost"
+        size={"custom"}
+        className="justify-start gap-2"
       >
-        View
+        <div className="user-card_avatar">
+          <Image
+            src={imgUrl}
+            alt={name}
+            width={38}
+            height={38}
+            className="rounded-full"
+          />
+        </div>
+
+        <div className="flex flex-col justify-between items-start text-ellipsis">
+          <h4 className="text-small-semibold text-light-1">{name}</h4>
+          <p className="text-subtle-medium text-gray-1">@{username}</p>
+        </div>
       </Button>
-    </article>
-  );
+    );
+  }
 };
 
 export default UserCard;

@@ -35,7 +35,6 @@ export async function updateUserOnClerk(
   };
 
   const user = await clerkClient.users.updateUser(userId, params);
-  console.log(user);
 }
 
 export async function getLoggedUser() {
