@@ -5,6 +5,7 @@ import Image from "next/image";
 import UserCard from "@/components/cards/UserCard";
 import { fetchCommunities } from "@/lib/actions/community.actions";
 import CommunityCard from "@/components/cards/CommunityCard";
+import { Input } from "@/components/ui/input";
 
 export default async function Page() {
   const user = await currentUser();
@@ -22,10 +23,14 @@ export default async function Page() {
 
   return (
     <section>
-      <h1 className="head-text mb-10"> Search</h1>
-      {/* serach bar */}
+      <h1 className="head-text mb-4"> Search</h1>
+      <Input
+        type="text"
+        className="account-form_input no-focus"
+        placeholder="Search..."
+      />
 
-      <div className="mt-14 flex flex-col gap-9">
+      <div className="mt-10 flex flex-col gap-9">
         {result.communities.length === 0 ? (
           <p className="no-result"> No Community Found</p>
         ) : (

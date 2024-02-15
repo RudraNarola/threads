@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const UserCard = ({
   id,
@@ -48,29 +49,24 @@ const UserCard = ({
         </Button>
       </article>
     ) : (
-      <Button
-        onClick={() => {
-          router.push(`/profile/${id}`);
-        }}
-        variant="ghost"
-        size={"custom"}
-        className="justify-start gap-2"
-      >
-        <div className="user-card_avatar">
-          <Image
-            src={imgUrl}
-            alt={name}
-            width={38}
-            height={38}
-            className="rounded-full"
-          />
-        </div>
+      <Link href={`/profile/${id}`}>
+        <article className="user-card">
+          <div className="user-card_avatar">
+            <Image
+              src={imgUrl}
+              alt={name}
+              width={38}
+              height={38}
+              className="rounded-full"
+            />
+          </div>
 
-        <div className="flex flex-col justify-between items-start text-ellipsis">
-          <h4 className="text-small-semibold text-light-1">{name}</h4>
-          <p className="text-subtle-medium text-gray-1">@{username}</p>
-        </div>
-      </Button>
+          <div className="flex  flex-col justify-between items-start gap-0.5 text-ellipsis">
+            <h4 className="text-base-regular text-light-1">{name}</h4>
+            <p className="text-subtle-semibold text-gray-1">@{username}</p>
+          </div>
+        </article>
+      </Link>
     );
   }
 };

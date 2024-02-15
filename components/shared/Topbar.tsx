@@ -59,7 +59,7 @@ async function Topbar() {
           </Button>
         </Link> */}
         <div className="flex items-center gap-4">
-          <p className="text-heading4-medium text-light-1 max-md:hidden">
+          <p className="text-base-medium text-light-1 max-md:hidden">
             {user.name}
           </p>
           <UserButton

@@ -1,41 +1,70 @@
-import { fetchUser, fetchUsers, getActivity } from "@/lib/actions/user.actions";
-import { currentUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
+import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
-export default async function Page() {
+import { fetchUser, getActivity } from "@/lib/actions/user.actions";
+
+async function Page() {
   const user = await currentUser();
   if (!user) return null;
 
   const userInfo = await fetchUser(user.id);
-  if (!userInfo?.onboarded) {
-    redirect("/onboarding");
-  }
+  if (!userInfo?.onboarded) redirect("/onboarding");
 
-  const activity = await getActivity(userInfo._id);
+  const { replies, likedUsers } = await getActivity(userInfo._id);
 
   return (
-    <section>
-      <h1 className="head-text mb-10"> Activity</h1>
+    <>
+      <h1 className="head-text">Activity</h1>
+
       <section className="mt-10 flex flex-col gap-5">
-        {activity.length > 0 ? (
+        {replies.length > 0 ? (
           <>
-            {activity.map((activity) => (
-              <Link key={activity._id} href={`/thread/${activity.parentId}`}>
+            {replies.map((replie) => (
+              <Link key={replie._id} href={`/thread/${replie.parentId}`}>
                 <article className="activity-card">
                   <Image
-                    src={activity.author.image}
-                    alt="activity"
-                    height={20}
-                    width={20}
+                    src={replie.author.image}
+                    alt="user_logo"
+                    width={32}
+                    height={32}
                     className="rounded-full object-cover"
                   />
-                  <p className="!text-small-regular text-light-1 ">
+                  <p className="!text-small-regular text-light-1 flex gap-1">
                     <span className="mr-1 text-primary-500">
-                      {activity.author.name}
+                      {replie.author.name}
                     </span>{" "}
+                    <Image
+                      src={"/assets/reply.svg"}
+                      alt="heart"
+                      height={20}
+                      width={20}
+                    />
                     replied to your thread
+                  </p>
+                </article>
+              </Link>
+            ))}
+            {likedUsers.map((user) => (
+              <Link key={user._id} href={`/thread/${user.id}`}>
+                <article className="activity-card">
+                  <Image
+                    src={user.image}
+                    alt="user_logo"
+                    width={32}
+                    height={32}
+                    className="rounded-full object-cover"
+                  />
+                  <p className="!text-small-regular text-light-1 flex gap-1">
+                    <span className="mr-1 text-primary-500">{user.name}</span>{" "}
+                    <Image
+                      src={"assets/heart-filled.svg"}
+                      alt="heart"
+                      height={20}
+                      width={20}
+                    />
+                    like to your thread
                   </p>
                 </article>
               </Link>
@@ -45,6 +74,8 @@ export default async function Page() {
           <p className="!text-base-regular text-light-3">No activity yet</p>
         )}
       </section>
-    </section>
+    </>
   );
 }
+
+export default Page;
