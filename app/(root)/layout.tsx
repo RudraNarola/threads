@@ -23,14 +23,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
+        <body className={`${inter.className}` + " main-scrollbar"}>
           <ThemeProvider>
             <Topbar />
 
             <main className="flex flex-row h-full">
               <LeftSidebar />
-              <section className="main-container">
-                <div className="w-full max-w-4xl">{children}</div>
+              <section className="main-container  ">
+                <div className="w-full max-w-4xl ">{children}</div>
               </section>
               <RightSidebar />
             </main>

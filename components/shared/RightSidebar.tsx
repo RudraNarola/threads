@@ -3,7 +3,7 @@ import SuggestedUser from "./SuggestedUser";
 export default function RightSidebar() {
   return (
     <section className="custom-scrollbar rightsidebar">
-      <div className="flex flex-1 flex-col justify-start">
+      <div className="flex flex-col  ">
         <SuggestedUser />
       </div>
       {/* <div className="flex flex-1 flex-col justify-start">

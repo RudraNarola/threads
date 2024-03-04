@@ -1,18 +1,10 @@
-import { fetchUser, getLoggedUser } from "@/lib/actions/user.actions";
-import {
-  currentUser,
-  OrganizationSwitcher,
-  SignedIn,
-  SignOutButton,
-  UserButton,
-  UserProfile,
-} from "@clerk/nextjs";
+// import { fetchUser, getLoggedUser } from "@/lib/actions/user.actions";
+import { SignedIn, SignOutButton, UserButton } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import Image from "next/image";
 import Link from "next/link";
 
 async function Topbar() {
-  const user = await getLoggedUser();
   return (
     <div className="topbar">
       <Link href="/" className="flex items-center gap-4">
@@ -59,10 +51,11 @@ async function Topbar() {
           </Button>
         </Link> */}
         <div className="flex items-center gap-4">
-          <p className="text-base-medium text-light-1 max-md:hidden">
+          {/* <p className="text-base-medium text-light-1 max-md:hidden">
             {user.name}
-          </p>
+          </p> */}
           <UserButton
+            showName={true}
             appearance={{
               baseTheme: dark,
 
